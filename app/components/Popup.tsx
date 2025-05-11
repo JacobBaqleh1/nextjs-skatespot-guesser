@@ -4,7 +4,7 @@ export default function Popup({ children }: { children: React.ReactNode }) {
     const [isVisible, setIsVisible] = useState(false);
 
     return (
-        <div className="relative">
+        <div className="relative ">
             {/* popup window */}
             <div className={`bg-red-200 h-screen absolute top-0 left-0 w-full transition-transform duration-300 ${isVisible ? "translate-y-0" : "-translate-y-full"
                 }`}>

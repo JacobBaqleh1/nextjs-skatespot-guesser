@@ -57,7 +57,7 @@ const GuessMarker = ({
     return null;
 };
 
-export default function MapView() {
+export default function MapView({ onClose }: { onClose: () => void }) {
     const [guessCoords, setGuessCoords] = useState<LatLngExpression | null>(null);
     const [submitted, setSubmitted] = useState(false);
     const [distance, setDistance] = useState<number | null>(null);
@@ -82,6 +82,13 @@ export default function MapView() {
 
     return (
         <div className="relative w-full h-full">
+            {/* Close Button */}
+            <button
+                onClick={onClose}
+                className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full shadow-md hover:bg-red-600 z-[1000]"
+            >
+                X
+            </button>
             <MapContainer
                 center={[39.8283, -98.5795]} // Center of the US
                 zoom={4}
@@ -109,16 +116,18 @@ export default function MapView() {
             </MapContainer>
 
             {/* Submit button */}
-            {guessCoords && !submitted && (
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-[1000]">
-                    <button
-                        onClick={handleSubmit}
-                        className="bg-blue-600 text-white px-4 py-2 rounded shadow"
-                    >
-                        Submit Guess
-                    </button>
-                </div>
-            )}
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-[1000]">
+                <button
+                    onClick={handleSubmit}
+                    disabled={!guessCoords} // Disable button if no pin is placed
+                    className={`px-4 py-2 rounded shadow text-white  ${guessCoords
+                            ? "bg-blue-600 hover:bg-blue-700"
+                            : "bg-blue-400 cursor-not-allowed"
+                        }`}
+                >
+                    {guessCoords ? "Submit Guess" : "Place your pin on the map"}
+                </button>
+            </div>
 
             {/* Distance Display */}
             {submitted && distance !== null && (

@@ -1,14 +1,14 @@
 [
   {
     "id": "1",
-    "name": "LES Skatepark",
-    "location": "New York City, NY",
-    "coordinates": [40.7178, -73.9875],
+    "name": "Waterfront 6 Stair Hubba",
+    
+    "coordinates": [45.522182, -122.669530],
     "images": [
-      "/images/les1.jpg",
-      "/images/les2.jpg"
+      "https://res.cloudinary.com/ddd8iimxv/image/upload/v1747196185/Waterfront-4-Stair-Hubba_rynxeo.png"
     ],
-    "video": ""
+    "video": "https://res.cloudinary.com/ddd8iimxv/video/upload/v1747196096/kbvv6d3ruhmsxf7bmthq.mp4"
+  
   },
   {
     "id": "2",

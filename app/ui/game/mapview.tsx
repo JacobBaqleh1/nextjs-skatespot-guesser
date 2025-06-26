@@ -11,6 +11,7 @@ import { useState } from "react";
 import type { LatLngExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import { useRouter } from "next/navigation";
 
 // Fix Leaflet's default icon issue
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -59,6 +60,7 @@ const GuessMarker = ({
 
 export default function MapView({ onClose }: { onClose: () => void }) {
     const [guessCoords, setGuessCoords] = useState<LatLngExpression | null>(null);
+    const router = useRouter();
     const [submitted, setSubmitted] = useState(false);
     const [distance, setDistance] = useState<number | null>(null);
 
@@ -69,14 +71,11 @@ export default function MapView({ onClose }: { onClose: () => void }) {
     };
 
     const handleSubmit = () => {
-        setSubmitted(true);
         if (guessCoords) {
             const point = L.latLng(guessCoords);
-            const lat1 = point.lat;
-            const lon1 = point.lng;
-            const [lat2, lon2] = NYC_COORDS as [number, number];
-            const dist = getDistanceInMiles(lat1, lon1, lat2, lon2);
-            setDistance(dist);
+            router.push(
+                `/dashboard/game/result?lat=${point.lat}&lng=${point.lng}`
+            );
         }
     };
 
@@ -121,8 +120,8 @@ export default function MapView({ onClose }: { onClose: () => void }) {
                     onClick={handleSubmit}
                     disabled={!guessCoords} // Disable button if no pin is placed
                     className={`px-4 py-2 rounded shadow text-white  ${guessCoords
-                            ? "bg-blue-600 hover:bg-blue-700"
-                            : "bg-blue-400 cursor-not-allowed"
+                        ? "bg-blue-600 hover:bg-blue-700"
+                        : "bg-blue-400 cursor-not-allowed"
                         }`}
                 >
                     {guessCoords ? "Submit Guess" : "Place your pin on the map"}

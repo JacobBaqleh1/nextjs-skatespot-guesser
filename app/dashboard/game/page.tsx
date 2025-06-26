@@ -20,7 +20,7 @@ export default function Page() {
         <div className="min-h-screen ">
 
             {/* Top menu */}
-            <div className="absolute top-0 left-0 w-full flex justify-center z-20 bg-white/80 py-2">
+            <div className="absolute top-0 left-0 w-full flex justify-center z-20  py-2">
                 <button
                     className={`mx-2 px-4 py-2 rounded ${view === "streetview" ? "bg-blue-600 text-white" : "bg-gray-200"}`}
                     onClick={() => setView("streetview")}
@@ -39,13 +39,20 @@ export default function Page() {
             <div className="w-full h-screen">
                 {view === "streetview" ? <StreetView /> : <SpotFootage />}
             </div>
-            <div className={`absolute bottom-0 left-0 w-full h-[75%] bg-white z-10 transition-transform duration-700 ${isMapVisible ? "translate-y-0" : "translate-y-full"
-                }`}
-                style={{
-                    transitionTimingFunction: "cubic-bezier(0.68, -0.55, 0.27, 1.55)", // Bouncy effect
-                }}>
-                <MapViewComponent onClose={() => setIsMapVisible(!isMapVisible)} />
-            </div>
+
+            {/* Only render the map overlay when visible */}
+            {isMapVisible && (
+                <div
+                    className={`absolute bottom-0 left-0 w-full h-[75%] bg-white z-10 transition-transform duration-700 ${isMapVisible ? "translate-y-0" : "translate-y-full"
+                        }`}
+                    style={{
+                        transitionTimingFunction: "cubic-bezier(0.68, -0.55, 0.27, 1.55)", // Bouncy effect
+                    }}
+                >
+                    <MapViewComponent onClose={() => setIsMapVisible(false)} />
+                </div>
+            )}
+
             {/* Button with SVG */}
             <button
                 className="z-1 absolute bottom-4 left-12 bg-lime-500 p-6 rounded-full shadow-md hover:bg-gray-200 "
@@ -68,36 +75,6 @@ export default function Page() {
                 </svg>
             </button>
 
-
-
-
-
-
-
         </div>
     );
 }
-
-
-
-
-
-
-
-
-
-{/* <h1 className="hidden sm:block">need to be in mobile view</h1> */ }
-{/* Mobile View */ }
-{/* <section className="sm:hidden">
-                <p className="text-center font-semibold mt-4">Mobile Game Page</p> */}
-
-{/* Spot image */ }
-{/* <div className="w-full flex justify-center p-4">
-                    <Image alt="spot" src={spot} className="max-w-full h-auto" />
-                </div> */}
-
-{/* Map View */ }
-{/* <div className="w-full h-[500px] relative">
-                    <MapViewComponent />
-                </div>
-            </section> */}

@@ -28,7 +28,9 @@ export default function StreetView() {
             }
 
             const svService = new google.maps.StreetViewService();
-            const targetLocation = { lat: 37.717896, lng: -122.409874 }; // Times Square
+            const targetLocation = {
+                lat: 45.522182, lng: -122.669530
+            };
 
             console.log('Fetching panorama for:', targetLocation);
 

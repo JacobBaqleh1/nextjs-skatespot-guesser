@@ -35,10 +35,3 @@ I built this project to:
 - Backend scoring API
 - Admin panel to add new skate spots
 
-## 🧪 How to Run Locally
-
-```bash
-git clone https://github.com/YOUR_USERNAME/skatespot-guesser.git
-cd skatespot-guesser
-npm install
-npm run dev 

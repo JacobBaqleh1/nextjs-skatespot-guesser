@@ -1,67 +1,102 @@
 "use client";
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import { getLastScore, getLastPlayed } from "@/app/utils/localGameStorage";
 
-function getNext7amPST() {
-  const now = new Date();
-  // PST is UTC-8, but for simplicity, we'll use UTC-8 (not handling DST here)
-  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-  const pstNow = new Date(utc - 8 * 3600000);
-  let next = new Date(pstNow);
-  next.setHours(7, 0, 0, 0);
-  if (pstNow.getHours() >= 7) {
-    next.setDate(next.getDate() + 1);
-  }
-  // Convert back to local time
-  return new Date(next.getTime() + 8 * 3600000);
-}
-
-function formatCountdown(ms: number) {
-  if (ms <= 0) return "00:00:00";
-  const totalSeconds = Math.floor(ms / 1000);
-  const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
-  const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
-  const seconds = String(totalSeconds % 60).padStart(2, "0");
-  return `${hours}:${minutes}:${seconds}`;
-}
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { hasPlayedToday, getTodayGameResult } from "@/app/utils/localGameStorage";
+import { getScoreRating } from "@/app/utils/scoreCalc";
 
 export default function Home() {
-  const [lastScore, setLastScore] = useState<number | null>(null);
-  const [lastPlayed, setLastPlayed] = useState<number | null>(null);
-  const [countdown, setCountdown] = useState<string>("");
+  const router = useRouter();
+  const [playedToday, setPlayedToday] = useState(false);
+  const [todayResult, setTodayResult] = useState<any>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setLastScore(getLastScore());
-    setLastPlayed(getLastPlayed());
+    setMounted(true);
+    setPlayedToday(hasPlayedToday());
+    setTodayResult(getTodayGameResult());
   }, []);
 
-  useEffect(() => {
-    if (!lastPlayed) return;
-    const next7am = getNext7amPST();
-    const interval = setInterval(() => {
-      setCountdown(formatCountdown(next7am.getTime() - Date.now()));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [lastPlayed]);
+  if (!mounted) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-lime-500"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="h-screen justify-center items-center flex flex-col">
-      <Link href='/dashboard/game' className="text-lime-500 text-4xl border-2 border-lime-500 p-10 mb-8">
-        PLAY
-      </Link>
-      {lastScore !== null && lastPlayed !== null && (
-        <div className="flex flex-col items-center mt-4">
-          <div className="mb-2">
-            <span className="font-semibold">Your miles score from previous game:</span>{" "}
-            <span className="text-blue-400">{lastScore}</span>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 to-black text-white px-4">
+      <div className="text-center mb-8">
+        <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-lime-400 to-green-500 bg-clip-text text-transparent">
+          🛹 SkateSpot Guesser
+        </h1>
+        <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          Can you identify famous skate spots from Street View and footage?
+        </p>
+      </div>
+
+      {/* Show result if played today, otherwise show play button */}
+      {playedToday && todayResult ? (
+        <div className="bg-gray-800 rounded-lg p-8 max-w-md w-full text-center border border-gray-600">
+          <h2 className="text-2xl font-bold mb-4">Today's Result 🎯</h2>
+
+          <div className="space-y-3 mb-6">
+            <p className="text-lg">
+              Distance: <span className="font-bold text-yellow-400">{todayResult.distance} miles</span>
+            </p>
+            <p className="text-xl font-bold text-green-400">
+              Score: {todayResult.score.toLocaleString()} points
+            </p>
+            <p className="text-gray-300">{getScoreRating(todayResult.score)}</p>
           </div>
-          <div>
-            <span className="font-semibold">Next game in: </span>
-            <span className="text-green-400">{countdown}</span>
+
+          <div className="space-y-3">
+            <button
+              onClick={() => router.push("/dashboard/game/result")}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition"
+            >
+              View Full Result
+            </button>
+
+            <p className="text-sm text-gray-400">
+              Come back tomorrow for a new spot! 🕐
+            </p>
           </div>
         </div>
+      ) : (
+        <div className="space-y-6">
+          <button
+            onClick={() => router.push("/dashboard/game")}
+            className="bg-lime-500 hover:bg-lime-600 text-black font-bold py-4 px-12 rounded-full text-2xl shadow-lg transition-all duration-300 hover:scale-105"
+          >
+            🎮 PLAY
+          </button>
+
+          <p className="text-center text-gray-400">
+            One guess per day • New spot every 24 hours
+          </p>
+        </div>
       )}
+
+      {/* How to play section */}
+      <div className="mt-12 max-w-2xl text-center">
+        <h3 className="text-xl font-semibold mb-4">How to Play</h3>
+        <div className="grid md:grid-cols-3 gap-6 text-sm text-gray-300">
+          <div>
+            <div className="text-2xl mb-2">👀</div>
+            <p>Study the Street View and spot footage</p>
+          </div>
+          <div>
+            <div className="text-2xl mb-2">📍</div>
+            <p>Place your pin on the world map</p>
+          </div>
+          <div>
+            <div className="text-2xl mb-2">🏆</div>
+            <p>Get points based on accuracy</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

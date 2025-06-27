@@ -1,4 +1,5 @@
 "use client";
+
 import {
     MapContainer,
     TileLayer,
@@ -6,25 +7,31 @@ import {
     Polyline,
     useMap,
 } from "react-leaflet";
-import type { LatLngExpression } from "leaflet";
-import "leaflet/dist/leaflet.css";
+import { LatLngExpression } from "leaflet";
+import { useEffect } from "react";
 import L from "leaflet";
-
-const CorrectCoords: LatLngExpression = [45.522182, -122.669530];
 
 function FitBounds({ points }: { points: LatLngExpression[] }) {
     const map = useMap();
-    if (points.length === 2) {
-        const bounds = L.latLngBounds(points[0], points[1]);
-        map.fitBounds(bounds, { padding: [50, 50] });
-    }
+
+    useEffect(() => {
+        const bounds = L.latLngBounds(points);
+        map.fitBounds(bounds, { padding: [20, 20] });
+    }, [map, points]);
+
     return null;
 }
 
-export default function ResultMap({ guess }: { guess: LatLngExpression }) {
+export default function ResultMap({
+    guess,
+    correctCoords,
+}: {
+    guess: LatLngExpression;
+    correctCoords: LatLngExpression;
+}) {
     return (
         <MapContainer
-            center={CorrectCoords}
+            center={correctCoords}
             zoom={4}
             className="w-full h-[50vh] rounded shadow mb-6"
             scrollWheelZoom={false}
@@ -36,10 +43,10 @@ export default function ResultMap({ guess }: { guess: LatLngExpression }) {
                 attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            <FitBounds points={[guess, CorrectCoords]} />
+            <FitBounds points={[guess, correctCoords]} />
             <Marker position={guess} />
-            <Marker position={CorrectCoords} />
-            <Polyline positions={[guess, CorrectCoords]} color="red" />
+            <Marker position={correctCoords} />
+            <Polyline positions={[guess, correctCoords]} color="red" />
         </MapContainer>
     );
 }

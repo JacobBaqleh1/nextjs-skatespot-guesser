@@ -24,24 +24,24 @@ L.Icon.Default.mergeOptions({
         "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
-const NYC_COORDS: LatLngExpression = [40.7128, -74.006]; // New York
-
 function getDistanceInMiles(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    const R = 6371; // Earth radius in km
+    const R = 3959; // Earth radius in MILES (not km!)
+
+    // Convert degrees to radians
     const dLat = (lat2 - lat1) * (Math.PI / 180);
     const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const lat1Rad = lat1 * (Math.PI / 180);
+    const lat2Rad = lat2 * (Math.PI / 180);
+
     const a =
         Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(lat1 * (Math.PI / 180)) *
-        Math.cos(lat2 * (Math.PI / 180)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
+        Math.cos(lat1Rad) * Math.cos(lat2Rad) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const distanceKm = R * c;
-    const distanceMiles = distanceKm * 0.621371;
+    const distance = R * c;
 
-    return Math.round(distanceMiles * 10) / 10; // Round to 1 decimal
+    return Math.round(distance * 10) / 10; // Round to 1 decimal place
 }
 
 const GuessMarker = ({
@@ -58,11 +58,21 @@ const GuessMarker = ({
     return null;
 };
 
-export default function MapView({ onClose }: { onClose: () => void }) {
+export default function MapView({
+    onClose,
+    correctCoords,
+    spotId
+}: {
+    onClose: () => void;
+    correctCoords: [number, number];
+    spotId: string;
+}) {
     const [guessCoords, setGuessCoords] = useState<LatLngExpression | null>(null);
     const router = useRouter();
     const [submitted, setSubmitted] = useState(false);
     const [distance, setDistance] = useState<number | null>(null);
+
+    const correctCoordsLatLng: LatLngExpression = [correctCoords[0], correctCoords[1]];
 
     const handleMapClick = (latlng: LatLngExpression) => {
         setGuessCoords(latlng);
@@ -74,7 +84,7 @@ export default function MapView({ onClose }: { onClose: () => void }) {
         if (guessCoords) {
             const point = L.latLng(guessCoords);
             router.push(
-                `/dashboard/game/result?lat=${point.lat}&lng=${point.lng}`
+                `/dashboard/game/result?lat=${point.lat}&lng=${point.lng}&correctLat=${correctCoords[0]}&correctLng=${correctCoords[1]}&spotId=${spotId}`
             );
         }
     };
@@ -84,7 +94,7 @@ export default function MapView({ onClose }: { onClose: () => void }) {
             {/* Close Button */}
             <button
                 onClick={onClose}
-                className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full shadow-md hover:bg-red-600 z-[1000]"
+                className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full shadow-md hover:bg-red-600 z-[1000] cursor-pointer"
             >
                 X
             </button>
@@ -103,12 +113,12 @@ export default function MapView({ onClose }: { onClose: () => void }) {
                 {/* Guess marker */}
                 {guessCoords && <Marker position={guessCoords} />}
 
-                {/* NYC marker + polyline */}
+                {/* Correct location marker + polyline */}
                 {submitted && (
                     <>
-                        <Marker position={NYC_COORDS} />
+                        <Marker position={correctCoordsLatLng} />
                         {guessCoords && (
-                            <Polyline positions={[guessCoords, NYC_COORDS]} color="red" />
+                            <Polyline positions={[guessCoords, correctCoordsLatLng]} color="red" />
                         )}
                     </>
                 )}
@@ -118,8 +128,8 @@ export default function MapView({ onClose }: { onClose: () => void }) {
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-[1000]">
                 <button
                     onClick={handleSubmit}
-                    disabled={!guessCoords} // Disable button if no pin is placed
-                    className={`px-4 py-2 rounded shadow text-white  ${guessCoords
+                    disabled={!guessCoords}
+                    className={`px-4 py-2 rounded shadow text-white ${guessCoords
                         ? "bg-blue-600 hover:bg-blue-700"
                         : "bg-blue-400 cursor-not-allowed"
                         }`}

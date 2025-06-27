@@ -5,13 +5,15 @@
 import { useEffect, useRef } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
 
-export default function StreetView() {
+export default function StreetView({ coordinates }: { coordinates: [number, number] }) {
     const streetViewRef = useRef<HTMLDivElement>(null);
-    let hasRendered = false;
+    const hasRendered = useRef(false); // ✅ Fixed the rate limiting issue
+    const panoramaRef = useRef<google.maps.StreetViewPanorama | null>(null);
 
     useEffect(() => {
-        if (hasRendered) return;
-        hasRendered = true;
+        if (hasRendered.current) return;
+        hasRendered.current = true;
+
         console.log('Loading Google Maps...');
 
         const loader = new Loader({
@@ -29,7 +31,8 @@ export default function StreetView() {
 
             const svService = new google.maps.StreetViewService();
             const targetLocation = {
-                lat: 45.522182, lng: -122.669530
+                lat: coordinates[0],
+                lng: coordinates[1]
             };
 
             console.log('Fetching panorama for:', targetLocation);
@@ -42,7 +45,7 @@ export default function StreetView() {
                     if (status === google.maps.StreetViewStatus.OK) {
                         console.log('Panorama data:', data);
 
-                        new google.maps.StreetViewPanorama(streetViewRef.current!, {
+                        panoramaRef.current = new google.maps.StreetViewPanorama(streetViewRef.current!, {
                             position: data?.location?.latLng,
                             pov: { heading: 165, pitch: 0 },
                             zoom: 1,
@@ -56,12 +59,18 @@ export default function StreetView() {
         }).catch((error) => {
             console.error('Error loading Google Maps API:', error);
         });
-    }, []);
 
-    return <div className="relative w-full h-screen">
-        {/* Street View Container */}
-        <div ref={streetViewRef} className="w-full h-full" />
+        // Cleanup function
+        return () => {
+            if (panoramaRef.current) {
+                panoramaRef.current = null;
+            }
+        };
+    }, [coordinates]);
 
-
-    </div>
+    return (
+        <div className="relative w-full h-screen">
+            <div ref={streetViewRef} className="w-full h-full" />
+        </div>
+    );
 }

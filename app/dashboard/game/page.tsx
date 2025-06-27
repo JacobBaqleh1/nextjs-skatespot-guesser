@@ -104,6 +104,7 @@ export default function Page() {
                     <MapViewComponent
                         onClose={() => setIsMapVisible(false)}
                         correctCoords={currentSpot.coordinates}
+                        spotId={currentSpot.id}
                     />
                 </div>
             )}

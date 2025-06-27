@@ -4,8 +4,13 @@
 
 import { useEffect, useRef } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
-
-export default function StreetView({ coordinates }: { coordinates: [number, number] }) {
+interface StreetViewProps {
+    coordinates: {
+        lat: number;
+        lng: number;
+    };
+}
+export default function StreetView({ coordinates }: StreetViewProps) {
     const streetViewRef = useRef<HTMLDivElement>(null);
     const hasRendered = useRef(false); // ✅ Fixed the rate limiting issue
     const panoramaRef = useRef<google.maps.StreetViewPanorama | null>(null);
@@ -31,8 +36,8 @@ export default function StreetView({ coordinates }: { coordinates: [number, numb
 
             const svService = new google.maps.StreetViewService();
             const targetLocation = {
-                lat: coordinates[0],
-                lng: coordinates[1]
+                lat: coordinates.lat,
+                lng: coordinates.lng
             };
 
             console.log('Fetching panorama for:', targetLocation);

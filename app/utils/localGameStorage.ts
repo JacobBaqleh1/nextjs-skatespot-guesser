@@ -3,7 +3,8 @@ interface GameResult {
     spotId: string;
     distance: number;
     score: number;
-    coordinates: [number, number];
+    guessCoordinates: [number, number];
+    correctCoordinates: [number, number]
     hasPlayed: boolean;
 }
 
@@ -11,14 +12,20 @@ export function getTodayDate(): string {
     return new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
 }
 
-export function saveGameResult(distance: number, score: number, spotId: string, coordinates: [number, number]) {
+export function saveGameResult(distance: number,
+     score: number,
+      spotId: string,
+       guessCoords: [number, number],   
+    correctCoords: [number, number]
+) {
     const today = getTodayDate();
     const result: GameResult = {
         date: today,
         spotId,
         distance,
         score,
-        coordinates,
+        guessCoordinates: guessCoords,
+        correctCoordinates: correctCoords,
         hasPlayed: true
     };
     

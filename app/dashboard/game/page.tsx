@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import StreetView from "@/app/components/StreetView";
 import { useState, useEffect } from "react";
 import SpotFootage from "@/app/components/SpotFootage";
-import { getCachedSpotsOrFetch, getTodaysSpot, SkateSpot } from "@/app/utils/firestore";
+import { getTodaysSpot, SkateSpot } from "@/app/utils/firestore";
 
 // Dynamically import map (client-only)
 const MapViewComponent = dynamic(() => import("@/app/ui/game/mapview"), {
@@ -17,7 +17,7 @@ export default function Page() {
     const [isMapVisible, setIsMapVisible] = useState(false);
     const [currentSpot, setCurrentSpot] = useState<SkateSpot | null>(null);
     const [loading, setLoading] = useState(true);
-    const [mounted, setMounted] = useState(false); // ✅ Add this
+    const [mounted, setMounted] = useState(false);
 
     // ✅ Ensure client-side only
     useEffect(() => {
@@ -26,13 +26,19 @@ export default function Page() {
 
     // Load today's spot from Firestore
     useEffect(() => {
-        if (!mounted) return; // ✅ Only run after mount
+        if (!mounted) return;
 
         async function loadTodaysSpot() {
             try {
-                const spots = await getCachedSpotsOrFetch();
-                const todaysSpot = getTodaysSpot(spots);
-                setCurrentSpot(todaysSpot);
+                console.log('🎯 Loading today\'s spot...');
+                const todaysSpot = await getTodaysSpot();
+
+                if (todaysSpot) {
+                    setCurrentSpot(todaysSpot);
+                    console.log('✅ Today\'s spot loaded:', todaysSpot);
+                } else {
+                    console.error('❌ Failed to load today\'s spot');
+                }
             } catch (error) {
                 console.error('Error loading spots:', error);
             } finally {
@@ -41,7 +47,7 @@ export default function Page() {
         }
 
         loadTodaysSpot();
-    }, [mounted]); // ✅ Depend on mounted
+    }, [mounted]);
 
     // ✅ Show loading until mounted and data loaded
     if (!mounted || loading) {
@@ -84,10 +90,13 @@ export default function Page() {
                 </button>
             </div>
 
-            {/* Main content - now uses dynamic spot data */}
+            {/* Main content */}
             <div className="w-full h-screen">
                 {view === "streetview"
-                    ? <StreetView coordinates={currentSpot.coordinates} />
+                    ? <StreetView coordinates={{
+                        lat: currentSpot.coordinates.latitude,
+                        lng: currentSpot.coordinates.longitude
+                    }} />
                     : <SpotFootage spot={currentSpot} />
                 }
             </div>
@@ -103,8 +112,11 @@ export default function Page() {
                 >
                     <MapViewComponent
                         onClose={() => setIsMapVisible(false)}
-                        correctCoords={currentSpot.coordinates}
-                        spotId={currentSpot.id}
+                        correctCoords={[
+                            currentSpot.coordinates.latitude,
+                            currentSpot.coordinates.longitude
+                        ]}
+                        spotId={currentSpot.id.toString()} // ✅ Pass the spot ID
                     />
                 </div>
             )}

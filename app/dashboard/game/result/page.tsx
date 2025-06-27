@@ -2,7 +2,7 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { saveGameResult } from "@/app/utils/localGameStorage";
+import { getTodayGameResult, saveGameResult } from "@/app/utils/localGameStorage";
 import { calculateScore, getScoreRating } from "@/app/utils/scoreCalc";
 
 // ✅ Fixed Haversine formula
@@ -31,37 +31,80 @@ const ResultMap = dynamic(() => import("@/app/components/ResultMap"), { ssr: fal
 export default function ResultPage() {
     const params = useSearchParams();
     const router = useRouter();
+    const [gameData, setGameData] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
     const [showAuthPrompt, setShowAuthPrompt] = useState(false);
 
-    // Get coordinates from URL params
-    const lat = parseFloat(params.get("lat") || "0");
-    const lng = parseFloat(params.get("lng") || "0");
-    const correctLat = parseFloat(params.get("correctLat") || "0");
-    const correctLng = parseFloat(params.get("correctLng") || "0");
-    const spotId = params.get("spotId") || "unknown";
-
-    const distance = getDistanceInMiles(lat, lng, correctLat, correctLng);
-    const score = calculateScore(distance);
-    const rating = getScoreRating(score);
-
     useEffect(() => {
-        // Save game result to localStorage
-        saveGameResult(distance, score, spotId, [lat, lng]);
+        const urlLat = params.get("lat");
+        const urlLng = params.get("lng");
+        const urlCorrectLat = params.get("correctLat");
+        const urlCorrectLng = params.get("correctLng");
 
-        // Show auth prompt after 2 seconds
-        const timer = setTimeout(() => {
-            setShowAuthPrompt(true);
-        }, 2000);
+        if (urlLat && urlLng && urlCorrectLat && urlCorrectLng) {
+            const lat = parseFloat(urlLat);
+            const lng = parseFloat(urlLng);
+            const correctLat = parseFloat(urlCorrectLat);
+            const correctLng = parseFloat(urlCorrectLng);
+            const spotId = params.get("spotId") || "unknown";
 
-        return () => clearTimeout(timer);
-    }, [distance, score, spotId, lat, lng]);
+            const distance = getDistanceInMiles(lat, lng, correctLat, correctLng);
+            const score = calculateScore(distance);
 
-    // Check if we have valid coordinates
-    if (!lat || !lng || !correctLat || !correctLng) {
+            const data = {
+                lat, lng, correctLat, correctLng, spotId, distance, score, rating: getScoreRating(score), isFromUrl: true
+            }
+
+            setGameData(data);
+
+            saveGameResult(distance, score, spotId, [lat, lng], [correctLat, correctLng]);
+            setTimeout(() => setShowAuthPrompt(true), 2000)
+            setLoading(false)
+
+        } else {
+            const savedResult = getTodayGameResult();
+
+            if (savedResult) {
+                const data = {
+                    lat: savedResult.guessCoordinates[0],
+                    lng: savedResult.guessCoordinates[1],
+                    correctLat: savedResult.correctCoordinates[0],
+                    correctLng: savedResult.correctCoordinates[1],
+                    spotId: savedResult.spotId,
+                    distance: savedResult.distance,
+                    score: savedResult.score,
+                    rating: getScoreRating(savedResult.score),
+                    isFromUrl: false
+                }
+
+                setGameData(data);
+                setLoading(false)
+            } else {
+                router.push('/');
+                return;
+            }
+
+        }
+
+    }, [params, router]);
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-black text-white">
+                <div className="text-center">
+                    <div className="text-2xl mb-4">Loading result...</div>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-lime-500 mx-auto"></div>
+                </div>
+            </div>
+        );
+    }
+
+    // ✅ Show error only if no data was loaded
+    if (!gameData) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white">
-                <h1 className="text-2xl mb-4">Error</h1>
-                <p className="mb-4">Missing game data</p>
+                <h1 className="text-2xl mb-4">No Result Found</h1>
+                <p className="mb-4">No game result available</p>
                 <button
                     onClick={() => router.push("/")}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded shadow text-lg transition"
@@ -77,23 +120,29 @@ export default function ResultPage() {
             <h1 className="text-3xl font-bold mb-6">🎯 Game Result</h1>
 
             <ResultMap
-                guess={[lat, lng]}
-                correctCoords={[correctLat, correctLng]}
+                guess={[gameData.lat, gameData.lng]}
+                correctCoords={[gameData.correctLat, gameData.correctLng]}
             />
 
             {/* Score Display */}
             <div className="text-center mb-8">
                 <p className="text-xl mb-2">
-                    You were <span className="font-bold text-yellow-400">{distance} miles</span> from the skate spot
+                    You were <span className="font-bold text-yellow-400">{gameData.distance} miles</span> from the skate spot
                 </p>
                 <p className="text-2xl font-bold text-green-400 mb-2">
-                    Your score: {score.toLocaleString()} points!
+                    Your score: {gameData.score.toLocaleString()} points!
                 </p>
-                <p className="text-lg text-gray-300">{rating}</p>
+                <p className="text-lg text-gray-300">{gameData.rating}</p>
             </div>
+            <button
+                onClick={() => router.push("/")}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg shadow text-lg transition font-semibold mb-8"
+            >
+                Back to Home
+            </button>
 
-            {/* Auth Prompt */}
-            {showAuthPrompt && (
+            {/* Auth Prompt - only show for fresh results */}
+            {showAuthPrompt && gameData.isFromUrl && (
                 <div className="bg-gray-800 rounded-lg p-6 mb-6 max-w-md w-full text-center border border-gray-600">
                     <h3 className="text-xl font-bold mb-4">Want to save your progress?</h3>
                     <p className="text-gray-300 mb-4">Create an account to track your daily scores and compete with others!</p>
@@ -123,12 +172,7 @@ export default function ResultPage() {
                 </div>
             )}
 
-            <button
-                onClick={() => router.push("/")}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg shadow text-lg transition font-semibold"
-            >
-                Back to Home
-            </button>
+
         </div>
     );
 }

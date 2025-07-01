@@ -1,60 +1,76 @@
 import { SkateSpot } from "@/app/utils/firestore";
+import { useState } from "react";
+import Zoom from 'react-medium-image-zoom'
+import 'react-medium-image-zoom/dist/styles.css'
 
 export default function SpotFootage({ spot }: { spot: SkateSpot }) {
     if (!spot) return <div className="text-white">Spot not found.</div>;
 
-    // Separate videos and images from media array
+    const [enlargedImg, setEnlargedImg] = useState<null | string>(null)
     const videos = spot.media.filter(url => url.includes('/video/'));
     const images = spot.media.filter(url => url.includes('/image/'));
 
     return (
-        <div className="w-full h-screen flex flex-col items-center justify-start bg-black pt-8">
-            {/* Header */}
-            <div className="flex flex-col items-center w-full mb-6">
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-12 h-12 text-white mb-2"
-                >
-                    <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-3A2.25 2.25 0 008.25 5.25V9m7.5 0v6m0-6h2.25A2.25 2.25 0 0120 11.25v1.5A2.25 2.25 0 0117.75 15H16.5m-7.5-6v6m0-6H6.75A2.25 2.25 0 004.5 11.25v1.5A2.25 2.25 0 006.75 15H8.25m8.25 0v2.25A2.25 2.25 0 0114.25 19.5h-4.5A2.25 2.25 0 017.5 17.25V15"
-                    />
-                </svg>
-                <span className="text-white text-lg font-semibold">Spot Media</span>
-            </div>
+        <div className="w-full h-screen flex flex-col items-center justify-start bg-gradient-to-b from-black via-gray-900 to-black pt-8 px-2">
+
 
             {/* Videos */}
             {videos.length > 0 && (
-                <div className="w-full overflow-x-auto flex space-x-4 px-4 mb-8">
-                    {videos.map((videoUrl, i) => (
-                        <video
-                            key={i}
-                            controls
-                            className="max-h-[30vh] rounded shadow min-w-[300px] bg-gray-900"
-                        >
-                            <source src={videoUrl} type="video/mp4" />
-                            Your browser does not support the video tag.
-                        </video>
-                    ))}
+                <div className="w-full mb-10">
+                    <div className="flex items-center mb-2">
+                        <svg className="w-6 h-6 text-lime-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 6h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
+                        </svg>
+                        <span className="text-white text-lg font-semibold">Videos</span>
+                    </div>
+                    <div className="flex overflow-x-auto gap-4 pb-2">
+                        {videos.map((videoUrl, i) => (
+                            <video
+                                key={i}
+                                controls
+                                className="rounded shadow min-w-[320px] max-w-[90vw] max-h-[30vh] bg-gray-900 border border-gray-700"
+
+                            >
+                                <source src={videoUrl} type="video/mp4" />
+                                Your browser does not support the video tag.
+                            </video>
+                        ))}
+                    </div>
                 </div>
             )}
 
             {/* Photos */}
+            {/* Enlarged Image Modal */}
+            {enlargedImg && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+                    onClick={() => setEnlargedImg(null)}
+                >
+                    <Zoom>
+                        <img
+                            src={enlargedImg}
+                            alt="Enlarged photo"
+                            className="max-w-[90vw] max-h-[80vh] rounded-2xl shadow-2xl border-4 border-blue-400 bg-white"
+                        />
+                    </Zoom>
+                </div>
+            )}
             {images.length > 0 && (
-                <div className="w-full flex flex-col items-center">
-                    <span className="text-white text-lg font-semibold mb-2">Photos</span>
-                    <div className="flex flex-wrap justify-center gap-4 px-4">
+                <div className="w-full mb-10">
+                    <div className="flex items-center mb-2">
+                        <svg className="w-6 h-6 text-yellow-300 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4-4a3 3 0 014 0l4 4M4 8h16M4 8V6a2 2 0 012-2h12a2 2 0 012 2v2" />
+                        </svg>
+                        <span className="text-white text-lg font-semibold">Photos</span>
+                    </div>
+                    <div className="flex overflow-x-auto gap-4 pb-2">
                         {images.map((imageUrl, i) => (
                             <img
                                 key={i}
                                 src={imageUrl}
                                 alt={`Skate spot photo ${i + 1}`}
-                                className="max-h-[25vh] rounded shadow bg-gray-900"
+                                className="rounded shadow min-w-[220px] max-w-[90vw] max-h-[25vh] object-cover border border-gray-700"
+                                onClick={() => setEnlargedImg(imageUrl)}
                             />
                         ))}
                     </div>
@@ -63,8 +79,12 @@ export default function SpotFootage({ spot }: { spot: SkateSpot }) {
 
             {/* Show message if no media */}
             {videos.length === 0 && images.length === 0 && (
-                <div className="text-white text-center">
-                    <p>No media available for this spot</p>
+                <div className="flex flex-col items-center justify-center h-full text-white text-center mt-12">
+                    <svg className="w-16 h-16 text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 21m5.25-4l.75 4m-7.5-8.25A7.5 7.5 0 1119.5 12a7.5 7.5 0 01-15 0z" />
+                    </svg>
+                    <p className="text-lg font-semibold">No media available for this spot</p>
+                    <p className="text-gray-400 text-sm mt-1">Check back later for videos or photos!</p>
                 </div>
             )}
         </div>

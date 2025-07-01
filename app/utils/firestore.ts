@@ -1,5 +1,29 @@
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, doc, setDoc, updateDoc, increment, arrayUnion, Timestamp, getDoc } from "firebase/firestore";
 import { db } from "./firebase";
+
+export interface GameStats {
+  uid: string;
+  totalGames: number;
+  totalScore: number;
+  averageDistance: number;
+  bestScore: number;
+  bestDistance: number;
+  gamesHistory: GameRecord[];
+  streakCount: number;
+  lastPlayedDate: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface GameRecord {
+  date: string;
+  spotId: string;
+  distance: number;
+  score: number;
+  guessCoordinates: [number, number];
+  correctCoordinates: [number, number];
+  playedAt: Timestamp;
+}
 
 export interface SkateSpot {
   id: number;
@@ -10,22 +34,137 @@ export interface SkateSpot {
   media: string[];
 }
 
+export async function createUserStats(uid: string): Promise<void> {
+  const userStatsRef = doc(db, 'userStats', uid);
+  const initialStats: GameStats = {
+    uid,
+    totalGames: 0,
+    totalScore: 0,
+    averageDistance: 0,
+    bestScore: 0,
+    bestDistance: Infinity,
+    gamesHistory: [],
+    streakCount: 0,
+    lastPlayedDate: '',
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now()
+  };
+
+  await setDoc(userStatsRef, initialStats)
+}
+
+export async function getUserStats(uid: string): Promise<GameStats | null> {
+  try {
+    const userStatsRef = doc(db, 'userStats', uid);
+    const docSnap = await getDoc(userStatsRef);
+
+    if (docSnap.exists()) {
+      return docSnap.data() as GameStats;
+    } else {
+      await createUserStats(uid);
+      return await getUserStats(uid);
+    }
+
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
+
+export async function saveGameToFirestore(
+  uid: string,
+  distance: number,
+  score: number,
+  spotId: string,
+  guessCoords: [number, number],
+  correctCoords: [number, number]
+): Promise<void> {
+  try {
+    const userStatsRef = doc(db, 'userStats', uid);
+    const currentStats = await getUserStats(uid);
+
+    if (!currentStats) {
+      throw new Error('could not retrieve user stats')
+    }
+
+    const gameRecord: GameRecord = {
+      date: new Date().toISOString().split('T')[0],
+      spotId,
+      distance,
+      score,
+      guessCoordinates: guessCoords,
+      correctCoordinates: correctCoords,
+      playedAt: Timestamp.now()
+    };
+
+    //Calculate new averages
+    const newTotalGames = currentStats.totalGames + 1;
+    const newTotalScore = currentStats.totalScore + score;
+    const newAverageDistance = ((currentStats.averageDistance * currentStats.totalGames) + distance / newTotalGames);
+
+    // Check for new records
+    const newBestScore = Math.max(currentStats.bestScore, score);
+    const newBestDistance = Math.min(currentStats.bestDistance, distance);
+
+    //Check streak (played yesterday or today)
+    const today = new Date().toISOString().split('T')[0];
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const newStreakCount = (currentStats.lastPlayedDate === yesterday) ? currentStats.streakCount + 1 : 1;
+
+    await updateDoc(userStatsRef, {
+      totalGames: newTotalGames,
+      totalScore: newTotalScore,
+      averageDistance: newAverageDistance,
+      bestScore: newBestScore,
+      bestDistance: newBestDistance,
+      gamesHistory: arrayUnion(gameRecord),
+      streakCount: newStreakCount,
+      lastPlayedDate: today,
+      updatedAt: Timestamp.now()
+    })
+    console.log('game saved to firestore successfully')
+
+
+
+
+
+  } catch (error) {
+    console.error('error', error);
+    throw error;
+  }
+}
+
+export async function getTodayGameFromFirestore(uid: string): Promise<GameRecord | null> {
+  try {
+    const stats = await getUserStats(uid);
+    if (!stats) return null;
+
+    const today = new Date().toISOString().split('T')[0];
+    const todayGame = stats.gamesHistory.find(game => game.date === today);
+
+    return todayGame || null;
+  } catch (error) {
+    console.error('error', error);
+    return null;
+  }
+}
+
 // Get today's spot based on sequential ID rotation
 // ✅ UPDATED: More robust date calculation
 export function getTodaysSpotId(totalSpots: number): number {
   const today = new Date();
-  
+
   // Use UTC to avoid timezone issues
   const year = today.getFullYear();
   const month = today.getMonth(); // 0-indexed (Jan = 0)
   const day = today.getDate();    // 1-indexed (1st = 1)
-  
+
   // Calculate day of year more reliably
   const startOfYear = new Date(year, 0, 1); // Jan 1st of current year
   const dayOfYear = Math.floor((today.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24));
-  
+
   const spotId = (dayOfYear % totalSpots) + 1;
-  
+
   console.log(`Today (${today.toDateString()}) is day ${dayOfYear} of the year, showing spot ${spotId}`);
   return spotId;
 }
@@ -81,20 +220,20 @@ export async function getAllSpots(): Promise<SkateSpot[]> {
 
     spots.sort((a, b) => a.id - b.id);
     console.log(`Loaded ${spots.length} spots from Firestore`);
-    
+
     return spots;
   } catch (error) {
     console.error('Error fetching spots:', error);
     return [];
   }
-  
+
 }
 
 // Get today's specific spot
 export async function getTodaysSpot(): Promise<SkateSpot | null> {
   try {
     const allSpots = await getAllSpots();
-    
+
     if (allSpots.length === 0) {
       console.error('No spots found in Firestore');
       return null;
@@ -130,10 +269,10 @@ export async function getCachedSpotsOrFetch(): Promise<SkateSpot[]> {
 
   console.log('Fetching fresh spots from Firestore');
   const spots = await getAllSpots();
-  
+
   localStorage.setItem('cached_spots', JSON.stringify(spots));
   localStorage.setItem('spots_cache_timestamp', now.toString());
-  
+
   return spots;
 }
 
@@ -145,13 +284,13 @@ export function testSpotRotation(dateString: string, totalSpots: number): number
   const year = parseInt(parts[0]);
   const month = parseInt(parts[1]) - 1; // Convert to 0-indexed
   const day = parseInt(parts[2]);
-  
+
   const testDate = new Date(year, month, day);
   const startOfYear = new Date(year, 0, 1);
-  
+
   const dayOfYear = Math.floor((testDate.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24));
   const spotId = (dayOfYear % totalSpots) + 1;
-  
+
   console.log(`${dateString} (${testDate.toDateString()}) → Day ${dayOfYear} → Spot ${spotId}`);
   return spotId;
 }

@@ -230,29 +230,30 @@ export async function getAllSpots(): Promise<SkateSpot[]> {
 }
 
 // Get today's specific spot
-export async function getTodaysSpot(): Promise<SkateSpot | null> {
-  try {
-    const allSpots = await getAllSpots();
+export async function getTodaysSpot(totalSpots: number) {
+  return 1;
+  // try {
+  //   const allSpots = await getAllSpots();
 
-    if (allSpots.length === 0) {
-      console.error('No spots found in Firestore');
-      return null;
-    }
+  //   if (allSpots.length === 0) {
+  //     console.error('No spots found in Firestore');
+  //     return null;
+  //   }
 
-    const todaysSpotId = getTodaysSpotId(allSpots.length);
-    const todaysSpot = allSpots.find(spot => spot.id === todaysSpotId);
+  //   const todaysSpotId = getTodaysSpotId(allSpots.length);
+  //   const todaysSpot = allSpots.find(spot => spot.id === todaysSpotId);
 
-    if (!todaysSpot) {
-      console.error(`Spot with ID ${todaysSpotId} not found`);
-      return allSpots[0]; // Fallback to first spot
-    }
+  //   if (!todaysSpot) {
+  //     console.error(`Spot with ID ${todaysSpotId} not found`);
+  //     return allSpots[0]; // Fallback to first spot
+  //   }
 
-    console.log(`Today's spot: ID ${todaysSpot.id}`, todaysSpot);
-    return todaysSpot;
-  } catch (error) {
-    console.error('Error getting today\'s spot:', error);
-    return null;
-  }
+  //   console.log(`Today's spot: ID ${todaysSpot.id}`, todaysSpot);
+  //   return todaysSpot;
+  // } catch (error) {
+  //   console.error('Error getting today\'s spot:', error);
+  //   return null;
+  // }
 }
 
 // Cache spots in localStorage to reduce Firestore calls

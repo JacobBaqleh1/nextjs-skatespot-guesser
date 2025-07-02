@@ -6,7 +6,7 @@ import { getTodayGameResult, saveGameResult } from "@/app/utils/localGameStorage
 import { calculateScore, getScoreRating } from "@/app/utils/scoreCalc";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { signInWithGoogle, signOutUser } from '@/app/utils/auth'
-import { saveGameToFirestore } from "@/app/utils/firestore";
+import { saveGameToFirestore } from "@/app/utils/firestoreStats";
 // ✅ Fixed Haversine formula
 function getDistanceInMiles(lat1: number, lon1: number, lat2: number, lon2: number): number {
     const R = 3959; // Earth radius in MILES (not km!)
@@ -38,11 +38,13 @@ export default function ResultPage() {
     const [showAuthPrompt, setShowAuthPrompt] = useState(false);
     const [authLoading, setAuthLoading] = useState(false);
     const [savingToCloud, setSavingToCloud] = useState(false);
+    const [hasSaved, setHasSaved] = useState(false);
     const { user, loading: authContextLoading } = useAuth();
+
 
     useEffect(() => {
         const saveToFirestore = async () => {
-            if (user && gameData && gameData.isFromUrl && !savingToCloud) {
+            if (user && gameData && gameData.isFromUrl && !hasSaved) {
                 setSavingToCloud(true);
                 try {
                     await saveGameToFirestore(
@@ -53,6 +55,7 @@ export default function ResultPage() {
                         [gameData.lat, gameData.lng],
                         [gameData.correctLat, gameData.correctLng]
                     );
+                    setHasSaved(true);
                     console.log('game result save to firestore')
                 } catch (error) {
                     console.error('failed to save to firestore', error)
@@ -62,7 +65,7 @@ export default function ResultPage() {
             }
         }
         saveToFirestore();
-    }, [user, gameData, savingToCloud]);
+    }, [user, gameData, hasSaved]);
 
     useEffect(() => {
         const urlLat = params.get("lat");
@@ -195,7 +198,7 @@ export default function ResultPage() {
                         <div className="mt-2">
                             {savingToCloud ? (
                                 <p className="text-sm text-yellow-400">
-                                    💾 Saving to your account...
+                                    Saving to your account...
                                 </p>
                             ) : (
                                 <p className="text-sm text-lime-400">

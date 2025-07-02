@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/contexts/AuthContext';
-import { getUserStats, GameStats } from '@/app/utils/firestore';
+import { getUserStats, GameStats } from '@/app/utils/firestoreStats';
 
 export default function StatsPage() {
     const { user, loading: authLoading } = useAuth();

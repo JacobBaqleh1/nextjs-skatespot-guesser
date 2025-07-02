@@ -1,29 +1,7 @@
-import { collection, getDocs, doc, setDoc, updateDoc, increment, arrayUnion, Timestamp, getDoc } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "./firebase";
 
-export interface GameStats {
-  uid: string;
-  totalGames: number;
-  totalScore: number;
-  averageDistance: number;
-  bestScore: number;
-  bestDistance: number;
-  gamesHistory: GameRecord[];
-  streakCount: number;
-  lastPlayedDate: string;
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
-}
 
-export interface GameRecord {
-  date: string;
-  spotId: string;
-  distance: number;
-  score: number;
-  guessCoordinates: [number, number];
-  correctCoordinates: [number, number];
-  playedAt: Timestamp;
-}
 
 export interface SkateSpot {
   id: number;
@@ -34,120 +12,9 @@ export interface SkateSpot {
   media: string[];
 }
 
-export async function createUserStats(uid: string): Promise<void> {
-  const userStatsRef = doc(db, 'userStats', uid);
-  const initialStats: GameStats = {
-    uid,
-    totalGames: 0,
-    totalScore: 0,
-    averageDistance: 0,
-    bestScore: 0,
-    bestDistance: Infinity,
-    gamesHistory: [],
-    streakCount: 0,
-    lastPlayedDate: '',
-    createdAt: Timestamp.now(),
-    updatedAt: Timestamp.now()
-  };
-
-  await setDoc(userStatsRef, initialStats)
-}
-
-export async function getUserStats(uid: string): Promise<GameStats | null> {
-  try {
-    const userStatsRef = doc(db, 'userStats', uid);
-    const docSnap = await getDoc(userStatsRef);
-
-    if (docSnap.exists()) {
-      return docSnap.data() as GameStats;
-    } else {
-      await createUserStats(uid);
-      return await getUserStats(uid);
-    }
-
-  } catch (error) {
-    console.error(error)
-    return null
-  }
-}
-
-export async function saveGameToFirestore(
-  uid: string,
-  distance: number,
-  score: number,
-  spotId: string,
-  guessCoords: [number, number],
-  correctCoords: [number, number]
-): Promise<void> {
-  try {
-    const userStatsRef = doc(db, 'userStats', uid);
-    const currentStats = await getUserStats(uid);
-
-    if (!currentStats) {
-      throw new Error('could not retrieve user stats')
-    }
-
-    const gameRecord: GameRecord = {
-      date: new Date().toISOString().split('T')[0],
-      spotId,
-      distance,
-      score,
-      guessCoordinates: guessCoords,
-      correctCoordinates: correctCoords,
-      playedAt: Timestamp.now()
-    };
-
-    //Calculate new averages
-    const newTotalGames = currentStats.totalGames + 1;
-    const newTotalScore = currentStats.totalScore + score;
-    const newAverageDistance = ((currentStats.averageDistance * currentStats.totalGames) + distance / newTotalGames);
-
-    // Check for new records
-    const newBestScore = Math.max(currentStats.bestScore, score);
-    const newBestDistance = Math.min(currentStats.bestDistance, distance);
-
-    //Check streak (played yesterday or today)
-    const today = new Date().toISOString().split('T')[0];
-    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-    const newStreakCount = (currentStats.lastPlayedDate === yesterday) ? currentStats.streakCount + 1 : 1;
-
-    await updateDoc(userStatsRef, {
-      totalGames: newTotalGames,
-      totalScore: newTotalScore,
-      averageDistance: newAverageDistance,
-      bestScore: newBestScore,
-      bestDistance: newBestDistance,
-      gamesHistory: arrayUnion(gameRecord),
-      streakCount: newStreakCount,
-      lastPlayedDate: today,
-      updatedAt: Timestamp.now()
-    })
-    console.log('game saved to firestore successfully')
 
 
 
-
-
-  } catch (error) {
-    console.error('error', error);
-    throw error;
-  }
-}
-
-export async function getTodayGameFromFirestore(uid: string): Promise<GameRecord | null> {
-  try {
-    const stats = await getUserStats(uid);
-    if (!stats) return null;
-
-    const today = new Date().toISOString().split('T')[0];
-    const todayGame = stats.gamesHistory.find(game => game.date === today);
-
-    return todayGame || null;
-  } catch (error) {
-    console.error('error', error);
-    return null;
-  }
-}
 
 // Get today's spot based on sequential ID rotation
 // ✅ UPDATED: More robust date calculation
@@ -230,30 +97,30 @@ export async function getAllSpots(): Promise<SkateSpot[]> {
 }
 
 // Get today's specific spot
-export async function getTodaysSpot(totalSpots: number) {
-  return 1;
-  // try {
-  //   const allSpots = await getAllSpots();
+export async function getTodaysSpot(): Promise<SkateSpot | null> {
 
-  //   if (allSpots.length === 0) {
-  //     console.error('No spots found in Firestore');
-  //     return null;
-  //   }
+  try {
+    const allSpots = await getAllSpots();
 
-  //   const todaysSpotId = getTodaysSpotId(allSpots.length);
-  //   const todaysSpot = allSpots.find(spot => spot.id === todaysSpotId);
+    if (allSpots.length === 0) {
+      console.error('No spots found in Firestore');
+      return null;
+    }
 
-  //   if (!todaysSpot) {
-  //     console.error(`Spot with ID ${todaysSpotId} not found`);
-  //     return allSpots[0]; // Fallback to first spot
-  //   }
+    const todaysSpotId = getTodaysSpotId(allSpots.length);
+    const todaysSpot = allSpots.find(spot => spot.id === todaysSpotId);
 
-  //   console.log(`Today's spot: ID ${todaysSpot.id}`, todaysSpot);
-  //   return todaysSpot;
-  // } catch (error) {
-  //   console.error('Error getting today\'s spot:', error);
-  //   return null;
-  // }
+    if (!todaysSpot) {
+      console.error(`Spot with ID ${todaysSpotId} not found`);
+      return allSpots[0]; // Fallback to first spot
+    }
+
+    console.log(`Today's spot: ID ${todaysSpot.id}`, todaysSpot);
+    return todaysSpot;
+  } catch (error) {
+    console.error('Error getting today\'s spot:', error);
+    return null;
+  }
 }
 
 // Cache spots in localStorage to reduce Firestore calls

@@ -1,12 +1,17 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { signInWithGoogle, signOutUser } from '@/app/utils/auth';
 
 export default function Navbar() {
     const { user } = useAuth();
     const router = useRouter();
+    const pathname = usePathname();
+
+    if (pathname === '/dashboard/game') {
+        return null;
+    }
 
     const handleSignOut = async () => {
         try {

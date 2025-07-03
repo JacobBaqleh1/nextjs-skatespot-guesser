@@ -24,6 +24,14 @@ export interface GameRecord {
     playedAt: Timestamp;
 }
 
+function getTodayLocalDate(): string {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+}
+
 
 export async function createUserStats(uid: string): Promise<void> {
     const userStatsRef = doc(db, 'userStats', uid);
@@ -79,7 +87,7 @@ export async function saveGameToFirestore(
         }
 
         const gameRecord: GameRecord = {
-            date: new Date().toISOString().split('T')[0],
+            date: getTodayLocalDate(),
             spotId,
             distance,
             score,
@@ -98,7 +106,7 @@ export async function saveGameToFirestore(
         const newBestDistance = Math.min(currentStats.bestDistance, distance);
 
         //Check streak (played yesterday or today)
-        const today = new Date().toISOString().split('T')[0];
+        const today = getTodayLocalDate();
         const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
         const newStreakCount = (currentStats.lastPlayedDate === yesterday) ? currentStats.streakCount + 1 : 1;
 
@@ -130,7 +138,7 @@ export async function getTodayGameFromFirestore(uid: string): Promise<GameRecord
         const stats = await getUserStats(uid);
         if (!stats) return null;
 
-        const today = new Date().toISOString().split('T')[0];
+        const today = getTodayLocalDate();
         const todayGame = stats.gamesHistory.find(game => game.date === today);
 
         return todayGame || null;

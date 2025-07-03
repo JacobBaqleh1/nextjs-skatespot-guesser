@@ -4,18 +4,40 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { hasPlayedToday, getTodayGameResult } from "@/app/utils/localGameStorage";
 import { getScoreRating } from "@/app/utils/scoreCalc";
+import { useAuth } from "./contexts/AuthContext";
+import { getTodayGameFromFirestore } from "./utils/firestoreStats";
 
 export default function Home() {
   const router = useRouter();
-  const [playedToday, setPlayedToday] = useState(false);
+  const [hasLocalUserPlayedToday, setHasLocalUserPlayedToday] = useState(false);
+  const [hasUserPlayedToday, setHasUserPlayedToday] = useState(false)
   const [todayResult, setTodayResult] = useState<any>(null);
   const [mounted, setMounted] = useState(false);
+  const { user } = useAuth();
+  const [firestoreTodayResult, setFirestoreTodayResult] = useState<any>(null);
 
+  //checking if players local storage played today 
   useEffect(() => {
     setMounted(true);
-    setPlayedToday(hasPlayedToday());
+    setHasLocalUserPlayedToday(hasPlayedToday());
     setTodayResult(getTodayGameResult());
   }, []);
+
+  //checking if user in db played today
+  useEffect(() => {
+    async function checkIfPlayed() {
+      if (user) {
+        const todayGame = await getTodayGameFromFirestore(user.uid);
+        setHasUserPlayedToday(!!todayGame);
+        setFirestoreTodayResult(todayGame);
+      } else {
+        setHasUserPlayedToday(hasPlayedToday());
+        setFirestoreTodayResult(null);
+      }
+    }
+    checkIfPlayed();
+  }, [user])
+
 
   if (!mounted) {
     return (
@@ -37,18 +59,22 @@ export default function Home() {
       </div>
 
       {/* Show result if played today, otherwise show play button */}
-      {playedToday && todayResult ? (
+      {(user ? hasUserPlayedToday && firestoreTodayResult : hasLocalUserPlayedToday && todayResult) ? (
         <div className="bg-gray-800 rounded-lg p-8 max-w-md w-full text-center border border-gray-600">
           <h2 className="text-2xl font-bold mb-4">Today's Result 🎯</h2>
 
           <div className="space-y-3 mb-6">
             <p className="text-lg">
-              Distance: <span className="font-bold text-yellow-400">{todayResult.distance} miles</span>
+              Distance: <span className="font-bold text-yellow-400">
+                {(user ? firestoreTodayResult.distance : todayResult.distance)}
+                miles</span>
             </p>
             <p className="text-xl font-bold text-green-400">
-              Score: {todayResult.score.toLocaleString()} points
+              Score: {(user ? firestoreTodayResult.score : todayResult.score.toLocaleString())} points
             </p>
-            <p className="text-gray-300">{getScoreRating(todayResult.score)}</p>
+            <p className="text-gray-300">
+              {getScoreRating(user ? firestoreTodayResult.score : todayResult.score)}
+            </p>
           </div>
 
           <div className="space-y-3">

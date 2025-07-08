@@ -17,7 +17,7 @@
 
 - **Nextjs** – frontend framework
 - **Tailwind CSS** – styling
-- (Optional future) **Supabase or Firebase** – for storing high scores and user accounts
+- **Firebase** - storage and authentication
 
 ## 🎯 Purpose & Learning Goals
 

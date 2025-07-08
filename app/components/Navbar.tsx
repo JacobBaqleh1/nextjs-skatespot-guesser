@@ -12,7 +12,10 @@ export default function Navbar() {
     if (pathname === '/dashboard/game') {
         return null;
     }
-
+    const handleSignIn = async () => {
+        await signInWithGoogle();
+        router.refresh(); // Soft refresh to trigger all effects and UI updates
+    };
     const handleSignOut = async () => {
         try {
             await signOutUser();
@@ -44,15 +47,15 @@ export default function Navbar() {
                                 </div>
                                 <button
                                     onClick={handleSignOut}
-                                    className="text-xs bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded transition"
+                                    className="text-xs bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded transition cursor-pointer"
                                 >
                                     Sign Out
                                 </button>
                             </>
                         ) : (
-                            <div className="text-sm text-gray-400">
+                            <div className="text-sm text-gray-400 cursor-pointer">
                                 <button
-                                    onClick={signInWithGoogle}
+                                    onClick={handleSignIn}
                                 >Sign In / Sign Up</button>
 
                             </div>

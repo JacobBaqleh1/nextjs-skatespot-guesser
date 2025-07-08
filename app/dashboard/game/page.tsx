@@ -89,7 +89,7 @@ export default function Page() {
             <div className="z-10 absolute bottom-4 left-12 flex items-center space-x-4">
                 {/* Map button */}
                 <button
-                    className="bg-lime-500 p-6 rounded-full shadow-md hover:bg-gray-200 flex items-center justify-center"
+                    className="bg-lime-500 p-6 rounded-full shadow-md hover:bg-lime-400 flex items-center justify-center cursor-pointer"
                     onClick={() => setIsMapVisible(!isMapVisible)}
                     aria-label="Show Map"
                 >
@@ -143,7 +143,7 @@ export default function Page() {
             {/* Map overlay */}
             {isMapVisible && (
                 <div
-                    className={`absolute bottom-0 left-0 w-full h-[75%] bg-white z-10 transition-transform duration-700 ${isMapVisible ? "translate-y-0" : "translate-y-full"
+                    className={`absolute bottom-0 left-0 w-full h-[50%] sm:w-1/2 bg-white z-10 transition-transform duration-700 ${isMapVisible ? "translate-y-0" : "translate-y-full"
                         }`}
                     style={{
                         transitionTimingFunction: "cubic-bezier(0.68, -0.55, 0.27, 1.55)",

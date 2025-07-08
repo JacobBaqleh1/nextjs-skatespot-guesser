@@ -1,5 +1,6 @@
 import { doc, setDoc, updateDoc, increment, arrayUnion, Timestamp, getDoc } from "firebase/firestore";
 import { db } from "./firebase";
+import { useRouter } from "next/navigation";
 
 export interface GameStats {
     uid: string;
@@ -81,6 +82,7 @@ export async function saveGameToFirestore(
     try {
         const userStatsRef = doc(db, 'userStats', uid);
         const currentStats = await getUserStats(uid);
+
 
         if (!currentStats) {
             throw new Error('could not retrieve user stats')

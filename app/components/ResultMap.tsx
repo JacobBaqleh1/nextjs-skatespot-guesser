@@ -67,7 +67,7 @@ export default function ResultMap({
     correctCoords: LatLngExpression;
 }) {
     return (
-        <div className="w-full">
+        <div className="w-full xl:max-w-6xl">
             {/* Map Legend */}
             <div className="flex justify-center gap-6 mb-3 text-sm">
                 <div className="flex items-center gap-2">
@@ -78,10 +78,7 @@ export default function ResultMap({
                     <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                     <span>Correct Location</span>
                 </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-6 h-0.5 bg-red-500"></div>
-                    <span>Distance</span>
-                </div>
+
             </div>
 
             <MapContainer

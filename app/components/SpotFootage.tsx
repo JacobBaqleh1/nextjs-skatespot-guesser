@@ -1,4 +1,4 @@
-import { SkateSpot } from "@/app/utils/firestore";
+import { SkateSpot, SkateSpotVideo } from "@/app/utils/firestore";
 import { useState } from "react";
 import Zoom from 'react-medium-image-zoom'
 import 'react-medium-image-zoom/dist/styles.css'
@@ -6,9 +6,13 @@ import 'react-medium-image-zoom/dist/styles.css'
 export default function SpotFootage({ spot }: { spot: SkateSpot }) {
     if (!spot) return <div className="text-white">Spot not found.</div>;
 
-    const [enlargedImg, setEnlargedImg] = useState<null | string>(null)
-    const videos = spot.media.filter(url => url.includes('/video/'));
-    const images = spot.media.filter(url => url.includes('/image/'));
+    const [enlargedImg, setEnlargedImg] = useState<null | string>(null);
+
+    // media is now an array of objects: { thumbnailUrl, videoUrl, name }
+    const videos: SkateSpotVideo[] = (spot.media || []).filter(item => item.videoUrl);
+
+    // Use the new 'photos' field for images
+    const images = (spot.photos || []).filter(url => url.includes('/image/'));
 
     return (
         <div className="w-full h-screen flex flex-col items-center justify-start bg-gradient-to-b from-black via-gray-900 to-black pt-8 px-2">
@@ -24,16 +28,20 @@ export default function SpotFootage({ spot }: { spot: SkateSpot }) {
                         <span className="text-white text-lg font-semibold">Videos</span>
                     </div>
                     <div className="flex overflow-x-auto gap-4 pb-2">
-                        {videos.map((videoUrl, i) => (
-                            <video
-                                key={i}
-                                controls
-                                className="rounded shadow min-w-[320px] max-w-[90vw] max-h-[30vh] bg-gray-900 border border-gray-700"
-
-                            >
-                                <source src={videoUrl} type="video/mp4" />
-                                Your browser does not support the video tag.
-                            </video>
+                        {videos.map((item, i) => (
+                            <div key={i} className="flex flex-col items-center">
+                                <video
+                                    controls
+                                    poster={item.thumbnailUrl}
+                                    className="rounded shadow min-w-[320px] max-w-[90vw] max-h-[30vh] bg-gray-900 border border-gray-700"
+                                >
+                                    <source src={item.videoUrl} type="video/mp4" />
+                                    Your browser does not support the video tag.
+                                </video>
+                                {item.name && (
+                                    <span className="text-xs text-gray-400 mt-1">🎥 {item.name}</span>
+                                )}
+                            </div>
                         ))}
                     </div>
                 </div>

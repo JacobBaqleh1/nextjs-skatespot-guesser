@@ -9,7 +9,13 @@ export interface SkateSpot {
     latitude: number;
     longitude: number;
   };
-  media: string[];
+  media: SkateSpotVideo[];
+  photos: string[];
+}
+export interface SkateSpotVideo {
+  thumbnailUrl: string;
+  videoUrl: string;
+  name?: string;
 }
 
 
@@ -81,7 +87,8 @@ export async function getAllSpots(): Promise<SkateSpot[]> {
       spots.push({
         id: data.id,
         coordinates: { latitude, longitude },
-        media: data.media || []
+        media: data.media || [],
+        photos: data.photos || []
       });
     });
 

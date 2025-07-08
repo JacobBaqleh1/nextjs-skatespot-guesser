@@ -211,7 +211,7 @@ export default function ResultPage() {
 
                 <button
                     onClick={() => router.push("/")}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg shadow text-lg transition font-semibold mb-8"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg shadow text-lg transition font-semibold mb-8 cursor-pointer"
                 >
                     Back to Home
                 </button>
@@ -243,7 +243,7 @@ export default function ResultPage() {
                                 {authLoading ? 'Signing in...' : 'Continue with Google'}
                             </button>
 
-                            <button className="w-full bg-gray-700 text-white px-4 py-3 rounded font-semibold hover:bg-gray-600 transition">
+                            {/* <button className="w-full bg-gray-700 text-white px-4 py-3 rounded font-semibold hover:bg-gray-600 transition">
                                 Other signup options
                             </button>
 
@@ -252,7 +252,7 @@ export default function ResultPage() {
                                 className="w-full text-gray-400 hover:text-white transition"
                             >
                                 Maybe later
-                            </button>
+                            </button> */}
                         </div>
                     </div>
                 )}

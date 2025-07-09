@@ -55,12 +55,13 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 to-black text-white px-4">
       <div className="text-center mb-8">
+        <p className="text-6xl font-bold mb-4 bg-gradient-to-r from-lime-400 to-green-500 bg-clip-text text-transparent">🛹</p>
         <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-lime-400 to-green-500 bg-clip-text text-transparent">
-          🛹 Spotta
+          Skate Spotter
         </h1>
 
         <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-          Can you identify famous skate spots from Street View and footage?
+          Can you identify skate spots from Street View and footage?
         </p>
       </div>
 

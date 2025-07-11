@@ -5,6 +5,10 @@ import StreetView from "@/app/components/StreetView";
 import { useState, useEffect } from "react";
 import SpotFootage from "@/app/components/SpotFootage";
 import { getTodaysSpot, SkateSpot } from "@/app/utils/firestore";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/contexts/AuthContext";
+import { getTodayGameFromFirestore } from "@/app/utils/firestoreStats";
+import { hasPlayedToday } from "@/app/utils/localGameStorage";
 
 // Dynamically import map (client-only)
 const MapViewComponent = dynamic(() => import("@/app/ui/game/mapview"), {
@@ -19,6 +23,25 @@ export default function Page() {
     const [loading, setLoading] = useState(true);
     const [mounted, setMounted] = useState(false);
 
+    const router = useRouter();
+    const { user } = useAuth();
+
+    //Redirect if already played today
+    useEffect(() => {
+        async function checkPlayed() {
+            if (user) {
+                const todayGame = await getTodayGameFromFirestore(user.uid);
+                if (todayGame) {
+                    router.replace('/dashboard/game/result')
+                }
+            } else {
+                if (hasPlayedToday()) {
+                    router.replace('/dashboard/game/result')
+                }
+            }
+        }
+        checkPlayed();
+    }, [user, router])
     // ✅ Ensure client-side only
     useEffect(() => {
         setMounted(true);

@@ -87,7 +87,13 @@ export async function saveGameToFirestore(
         if (!currentStats) {
             throw new Error('could not retrieve user stats')
         }
-
+        const today = getTodayLocalDate();
+        const alreadyPlayed = currentStats.gamesHistory.some(
+            game => game.date === today && game.spotId === spotId
+        );
+        if (alreadyPlayed) {
+            return;
+        }
         const gameRecord: GameRecord = {
             date: getTodayLocalDate(),
             spotId,
@@ -108,7 +114,7 @@ export async function saveGameToFirestore(
         const newBestDistance = Math.min(currentStats.bestDistance, distance);
 
         //Check streak (played yesterday or today)
-        const today = getTodayLocalDate();
+
         const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
         const newStreakCount = (currentStats.lastPlayedDate === yesterday) ? currentStats.streakCount + 1 : 1;
 

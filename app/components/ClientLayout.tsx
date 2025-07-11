@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from "next/navigation";
-import Navbar from "./Navbar";
+// import Navbar from "./Navbar";
 
 const HIDDEN_NAVBAR_ROUTES = [
     "/dashboard/game",
@@ -15,7 +15,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
     return (
         <>
-            {!hideNavbar && <Navbar />}
+            {/* {!hideNavbar && <Navbar />} */}
             <main className={hideNavbar ? "" : ""}>
                 {children}
             </main>

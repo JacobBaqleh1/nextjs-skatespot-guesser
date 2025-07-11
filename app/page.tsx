@@ -53,9 +53,9 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 to-black text-white px-4">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 to-black text-white px-4 ">
       <div className="text-center mb-8">
-        <p className="text-6xl font-bold mb-4 bg-gradient-to-r from-lime-400 to-green-500 bg-clip-text text-transparent">🛹</p>
+        <p className="text-6xl font-bold mb-4 bg-gradient-to-r from-lime-400 to-green-500 bg-clip-text text-transparent mt-8">🛹</p>
         <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-lime-400 to-green-500 bg-clip-text text-transparent">
           Skate Spotter
         </h1>
@@ -69,7 +69,7 @@ export default function Home() {
       {(user ? hasUserPlayedToday && firestoreTodayResult : hasLocalUserPlayedToday && todayResult) ? (
         <div className="backdrop-blur-md bg-white/10 border border-gray-700 shadow-2xl rounded-2xl p-8 max-w-md w-full text-center flex flex-col items-center">
           <CountdownTimer />
-          <h2 className="text-2xl font-bold mb-4 text-blue-200 drop-shadow">Today's Result 🎯</h2>
+          <h2 className="text-2xl font-bold mb-4 text-blue-200 drop-shadow mt-8">Today's Result 🎯</h2>
           <div className="space-y-3 mb-6 w-full">
             <div className="flex flex-col md:flex-row justify-center gap-4">
               <div className="flex flex-col items-center bg-gradient-to-br from-gray-900/80 via-gray-800/80 to-black/80 rounded-xl p-4 border border-gray-700 shadow">
@@ -89,12 +89,12 @@ export default function Home() {
               {getScoreRating(user ? firestoreTodayResult.score : todayResult.score)}
             </p>
           </div>
-          <button
+          {/* <button
             onClick={() => router.push("/dashboard/game/result")}
-            className="w-full bg-blue-600/90 hover:bg-blue-700/90 text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-all"
+            className="w-full bg-blue-600/90 hover:bg-blue-700/90 text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition-all mt-10"
           >
-            View Full Result
-          </button>
+            View Todays Result
+          </button> */}
           <p className="text-sm text-gray-400 mt-3">
             Come back tomorrow for a new spot! 🕐
           </p>

@@ -17,13 +17,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Spotta",
   description: "Geoguessing skate spots",
-  icons:
-  {
-    icon: "https://fav.farm/🛹"
-  }
+  icons: {
+    icon: "https://fav.farm/🛹",
+  },
 };
-
-
 
 export default function RootLayout({
   children,
@@ -36,10 +33,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
-
-          <ClientLayout>
-            {children}
-          </ClientLayout>
+          <ClientLayout>{children}</ClientLayout>
         </AuthProvider>
       </body>
     </html>

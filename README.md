@@ -27,11 +27,5 @@ I built this project to:
 - Learn how to **work with third-party APIs and SDKs** in a modern frontend workflow
 - Combine my love of skateboarding with a technical challenge that’s fun and interactive
 
-## 🏗️ Future Improvements
 
-- Add login + leaderboard using Supabase
-- Display actual distance between guess and real location
-- Time-limited rounds
-- Backend scoring API
-- Admin panel to add new skate spots
 

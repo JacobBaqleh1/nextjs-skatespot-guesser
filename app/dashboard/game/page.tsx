@@ -173,7 +173,7 @@ export default function Page() {
           {/* Legend */}
           <div className="hidden sm:block flex flex-col gap-2 mt-2">
             <span className="flex items-center gap-2">
-              <span className=" flex items-center justify-center">
+              <span className="flex items-center justify-center">
                             <img src="/map.svg" alt="map" className="w-6 h-6"/>
 
               </span>

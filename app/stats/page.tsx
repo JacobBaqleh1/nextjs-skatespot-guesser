@@ -79,7 +79,7 @@ export default function StatsPage() {
         <h1 className="text-4xl font-bold mb-8 text-center">📊 Your Stats</h1>
 
         {/* Main Stats Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="flex gap-6 mb-8 justify-center">
           <div className="bg-gray-800 rounded-lg p-6 text-center">
             <div className="text-3xl font-bold text-lime-400">
               {stats.totalGames}
@@ -94,12 +94,7 @@ export default function StatsPage() {
             <div className="text-gray-300">Total Score</div>
           </div>
 
-          <div className="bg-gray-800 rounded-lg p-6 text-center">
-            <div className="text-3xl font-bold text-yellow-400">
-              {stats.averageDistance.toFixed(1)}mi
-            </div>
-            <div className="text-gray-300">Avg Distance</div>
-          </div>
+          
 
           <div className="bg-gray-800 rounded-lg p-6 text-center">
             <div className="text-3xl font-bold text-orange-400">

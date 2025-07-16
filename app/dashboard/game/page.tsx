@@ -111,76 +111,111 @@ export default function Page() {
         )}
       </div>
 
-      {/* Map and View Buttons - bottom left */}
-      <div className="z-10 absolute bottom-4 left-12 flex items-center space-x-4">
-        {/* Map button */}
-        <button
-          className="bg-lime-500 p-6 rounded-full shadow-md hover:bg-lime-400 flex items-center justify-center cursor-pointer"
-          onClick={() => setIsMapVisible(!isMapVisible)}
-          aria-label="Show Map"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-8 h-8"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M9 9l10.5-4.5m0 0L15 15m4.5-10.5V15m0 0L9 19.5M15 15l-6 4.5M9 9v10.5m0 0L3 15V4.5l6 4.5z"
-            />
-          </svg>
-        </button>
-        {/* View buttons as a segmented control */}
-        <div className="flex flex-col sm:flex-row bg-gray-100 rounded-full shadow-inner overflow-hidden border border-gray-300">
+      {/* Combined Card for Map Button, View Buttons, and Legend (vertical layout) */}
+      <div className="z-10 absolute bottom-4 right-14">
+        <div className="flex flex-col items-start gap-4 bg-white rounded-2xl shadow-xl px-5 py-4 border border-gray-200 w-56">
+          {/* Map button */}
           <button
-            className={`flex items-center gap-2 px-5 py-2 font-semibold transition 
+            className="hover:bg-lime-400 transition p-4 rounded-full shadow flex items-center justify-center self-center"
+            onClick={() => setIsMapVisible(!isMapVisible)}
+            aria-label="Show Map"
+          >
+            <img src="/map.svg" alt="map" className="w-16 h-16"/>
+          </button>
+          {/* View buttons */}
+          <div className="flex flex-col w-full gap-2 mt-2">
+            <button
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-base shadow transition
                 ${
                   view === "streetview"
-                    ? "bg-blue-600 text-white shadow"
-                    : "bg-transparent text-gray-700 hover:bg-blue-100"
+                    ? "bg-blue-600 text-white scale-105 ring-2 ring-blue-300"
+                    : "bg-white text-blue-700 border border-blue-200 hover:bg-blue-50 hover:scale-105"
                 }`}
-            onClick={() => setView("streetview")}
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              viewBox="0 0 24 24"
+              onClick={() => setView("streetview")}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 20v-6m0 0V4m0 10l3-3m-3 3l-3-3"
-              />
-            </svg>
-            Street View
-          </button>
-          <button
-            className={`flex items-center gap-2 px-5 py-2 font-semibold transition 
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 20v-6m0 0V4m0 10l3-3m-3 3l-3-3"
+                />
+              </svg>
+              Street View
+            </button>
+            <button
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-base shadow transition
                 ${
                   view === "footage"
-                    ? "bg-blue-600 text-white shadow"
-                    : "bg-transparent text-gray-700 hover:bg-blue-100"
+                    ? "bg-green-600 text-white scale-105 ring-2 ring-green-300"
+                    : "bg-white text-green-700 border border-green-200 hover:bg-green-50 hover:scale-105"
                 }`}
-            onClick={() => setView("footage")}
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              viewBox="0 0 24 24"
+              onClick={() => setView("footage")}
             >
-              <rect x="3" y="7" width="18" height="10" rx="2" />
-              <path d="M15 11l4-2v6l-4-2" />
-            </svg>
-            Spot Footage
-          </button>
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <rect x="3" y="7" width="18" height="10" rx="2" />
+                <path d="M15 11l4-2v6l-4-2" />
+              </svg>
+              Spot Footage
+            </button>
+          </div>
+          {/* Legend */}
+          <div className="hidden sm:block flex flex-col gap-2 mt-2">
+            <span className="flex items-center gap-2">
+              <span className=" flex items-center justify-center">
+                            <img src="/map.svg" alt="map" className="w-6 h-6"/>
+
+              </span>
+              <span className="text-xs text-gray-700">Map</span>
+            </span>
+            <span className="flex items-center gap-2">
+              <span className="bg-blue-600 rounded-full p-1 flex items-center justify-center">
+                <svg
+                  className="w-4 h-4 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 20v-6m0 0V4m0 10l3-3m-3 3l-3-3"
+                  />
+                </svg>
+              </span>
+              <span className="text-xs text-gray-700">Street View</span>
+            </span>
+            <span className="flex items-center gap-2">
+              <span className="bg-green-600 rounded-full p-1 flex items-center justify-center">
+                <svg
+                  className="w-4 h-4 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
+                  <rect x="3" y="7" width="18" height="10" rx="2" />
+                  <path d="M15 11l4-2v6l-4-2" />
+                </svg>
+              </span>
+              <span className="text-xs text-gray-700">Footage</span>
+            </span>
+          </div>
+          <div className="hidden sm:block mt-2 text-xs text-gray-500">
+            <span className="font-semibold">How to play:</span> Click the map, place your pin and submit your guess!
+          </div>
         </div>
       </div>
 

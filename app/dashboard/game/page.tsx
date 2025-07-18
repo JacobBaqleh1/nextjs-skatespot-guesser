@@ -123,7 +123,7 @@ export default function Page() {
             <img src="/map.svg" alt="map" className="w-16 h-16"/>
           </button>
           {/* View buttons */}
-          <div className="flex flex-col w-full gap-2 mt-2">
+          <div className="flex flex-row sm:flex-col w-full gap-2 mt-2">
             <button
               className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-base shadow transition
                 ${

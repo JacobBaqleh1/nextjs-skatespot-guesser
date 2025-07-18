@@ -112,8 +112,8 @@ export default function Page() {
       </div>
 
       {/* Combined Card for Map Button, View Buttons, and Legend (vertical layout) */}
-      <div className="z-10 absolute bottom-4 right-14">
-        <div className="flex flex-row sm:flex-col items-start gap-4 bg-white rounded-2xl shadow-xl px-5 py-4 border border-gray-200 w-56">
+      <div className="z-10 absolute bottom-4 sm:right-14">
+        <div className="flex flex-row sm:flex-col items-start gap-4 bg-white rounded-2xl shadow-xl px-5 py-4 border border-gray-200 sm:w-56">
           {/* Map button */}
           <button
             className="hover:bg-lime-400 transition p-4 rounded-full shadow flex items-center justify-center self-center"

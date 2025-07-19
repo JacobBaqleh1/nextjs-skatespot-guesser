@@ -4,7 +4,6 @@
 
 ## 🚀 Features
 
-- Currently in development
  - 🗺️ Interactive map 
 - 📍 User can place a marker 
 - 🧠 Score system 

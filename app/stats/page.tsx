@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { getUserStats, GameStats } from "@/app/utils/firestoreStats";
+import Navbar from "../components/Navbar";
 
 export default function StatsPage() {
   const { user, loading: authLoading } = useAuth();
@@ -75,6 +76,7 @@ export default function StatsPage() {
 
   return (
     <div className="min-h-screen bg-black text-white px-4 py-8">
+      <Navbar />
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold mb-8 text-center">📊 Your Stats</h1>
 

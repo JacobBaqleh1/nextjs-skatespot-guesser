@@ -35,10 +35,11 @@ export default function Navbar() {
             {user ? (
               <>
                 <button
-                  onClick={() => router.push("/stats")}
-                  className="text-sm text-gray-300 hover:text-white transition"
+                  onClick={() => router.push("/")}
+                  className="flex items-center gap-2 text-lg font-semibold text-lime-400 hover:text-white px-4 py-1 rounded-full bg-gray-800 hover:bg-lime-500/20 shadow transition-all duration-200 cursor-pointer"
                 >
-                  📊 Stats
+                  
+                  Home
                 </button>
                 <div className="text-sm text-gray-300">
                   Welcome, {user.displayName || user.email}!
@@ -52,7 +53,7 @@ export default function Navbar() {
               </>
             ) : (
               <div className="text-sm text-gray-400 cursor-pointer">
-                <button onClick={handleSignIn}>Sign In / Sign Up</button>
+                <button onClick={handleSignIn}>Log In</button>
               </div>
             )}
           </div>

@@ -71,6 +71,7 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 to-black text-white px-4 ">
       {/* Main content */}
+      
       <div className="text-center mb-8">
         <p className="text-6xl font-bold mb-4 bg-gradient-to-r from-lime-400 to-green-500 bg-clip-text text-transparent mt-8">
           🛹
@@ -94,33 +95,36 @@ export default function Home() {
           <CountdownTimer />
 
           {user ? (
+            <>
+            <div className="mt-4 text-gray-300">
+                  Welcome, {user.displayName || user.email}!
+                </div>
             <div className="flex gap-4 ">
               <div 
               className="flex flex-col items-center
-               bg-gradient-to-br from-gray-900/80 via-gray-800/80 to-black/80 rounded-xl
-                p-4 border border-gray-700 shadow mt-4 cursor-pointer  ">
+                mt-4 cursor-pointer  ">
                 <button
                   onClick={() => router.push("/stats")}
-                  className="text-sm text-gray-300 hover:text-white transition cursor-pointer hover:scale-105"
+                className="bg-white hover:bg-gray-100 text-black font-semibold py-3 px-8 rounded-full text-lg shadow transition-all duration-300 hover:scale-105 cursor-pointer"
                 >
                   📊 Stats
                 </button>
               </div>
-              <div className="flex flex-col items-center bg-gradient-to-br from-gray-900/80 via-gray-800/80 to-black/80 rounded-xl p-4 border border-gray-700 shadow
-              mt-4 cursor-pointer hover:scale-105">
+              <div className="flex flex-col items-center mt-4 cursor-pointer hover:scale-105">
                 <button
                   onClick={handleSignOut}
-                  className="text-xs cursor-pointer text-white px-3 py-1 rounded transition "
+                className="bg-white hover:bg-gray-100 text-black font-semibold py-3 px-8 rounded-full text-lg shadow transition-all duration-300 hover:scale-105 cursor-pointer"
                 >
                   Sign Out
                 </button>
               </div>
             </div>
+            </>
           ) : (
-              <div className="flex flex-col items-center bg-gradient-to-br from-gray-900/80 via-gray-800/80 to-black/80 rounded-xl p-4 border border-gray-700 shadow mt-4">
+              <div className="flex flex-col items-center mt-4">
               <button
                 onClick={handleSignIn}
-                className="cursor-pointer hover:bg-gray-800 transition hover:scale-105"
+                className="bg-white hover:bg-gray-100 text-black font-semibold py-3 px-8 rounded-full text-lg shadow transition-all duration-300 hover:scale-105 cursor-pointer"
               >
                 Log In
               </button>

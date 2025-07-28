@@ -22,7 +22,7 @@ export default function Page() {
   const [currentSpot, setCurrentSpot] = useState<SkateSpot | null>(null);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
-
+const [showIntro, setShowIntro] = useState(true);
   const router = useRouter();
   const { user } = useAuth();
 
@@ -97,6 +97,29 @@ export default function Page() {
 
   return (
     <div className="min-h-screen">
+{showIntro ? (
+<>
+<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-white rounded-xl shadow-2xl p-8 max-w-sm w-full text-center">
+            <h2 className="text-2xl font-bold mb-4 text-gray-900">How To Play</h2>
+            <p className="mb-6 text-gray-700">
+              Guess the spot by clicking on the map
+              <img src="/map.svg" alt="map" className="w-8 h-8 inline-block align-middle mx-1" />
+              and placing your pin📍. Click <span className="text-lime-900 font-bold">Spot Footage</span> for skateboarding media. Good luck!
+            </p>
+            <button
+              onClick={() => setShowIntro(false)}
+              className="bg-lime-500 hover:bg-lime-600 text-black font-semibold px-6 py-2 rounded-full shadow transition cursor-pointer"
+            >
+              Got it!
+            </button>
+          </div>
+        </div>
+</>
+):
+null
+}
+
       {/* Main content */}
       <div className="w-full h-screen">
         {view === "streetview" ? (
@@ -171,7 +194,7 @@ export default function Page() {
             </button>
           </div>
           {/* Legend */}
-          <div className="hidden sm:block flex flex-col gap-2 mt-2">
+          <div className="hidden sm:flex flex-col gap-2 mt-2">
             <span className="flex items-center gap-2">
               <span className="flex items-center justify-center">
                             <img src="/map.svg" alt="map" className="w-6 h-6"/>
@@ -214,7 +237,7 @@ export default function Page() {
             </span>
           </div>
           <div className="hidden sm:block mt-2 text-xs text-gray-500">
-            <span className="font-semibold">How to play:</span> Click the map, place your pin and submit your guess!
+            <span className="font-semibold">How to play:</span> Click the map <img src="/map.svg" alt="map" className="w-6 h-6"/>, place your pin and submit your guess!
           </div>
         </div>
       </div>

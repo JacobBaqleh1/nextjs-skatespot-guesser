@@ -10,7 +10,7 @@ export async function signInWithGoogle() {
   try {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
-    console.log("Google sign-in successful:", result.user);
+
     return result.user;
   } catch (error: any) {
     console.error("google sign-in error:", error);
@@ -26,7 +26,6 @@ export async function signInWithGoogle() {
 export async function signOutUser(): Promise<void> {
   try {
     await signOut(auth);
-    console.log("User signed out successfully");
   } catch (error) {
     console.error("sign out error:", error);
     throw new Error("failed to sign out");

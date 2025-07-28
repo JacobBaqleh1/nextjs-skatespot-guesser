@@ -102,7 +102,7 @@ export async function getAllSpots(): Promise<SkateSpot[]> {
     });
 
     spots.sort((a, b) => a.id - b.id);
-    console.log(`Loaded ${spots.length} spots from Firestore`);
+    
 
     return spots;
   } catch (error) {
@@ -129,7 +129,7 @@ export async function getTodaysSpot(): Promise<SkateSpot | null> {
       return allSpots[0]; // Fallback to first spot
     }
 
-    console.log(`Today's spot: ID ${todaysSpot.id}`, todaysSpot);
+    
     return todaysSpot;
   } catch (error) {
     console.error("Error getting today's spot:", error);
@@ -149,11 +149,11 @@ export async function getCachedSpotsOrFetch(): Promise<SkateSpot[]> {
     cacheTimestamp &&
     now - parseInt(cacheTimestamp) < CACHE_DURATION
   ) {
-    console.log("Using cached spots");
+   
     return JSON.parse(cached);
   }
 
-  console.log("Fetching fresh spots from Firestore");
+  
   const spots = await getAllSpots();
 
   localStorage.setItem("cached_spots", JSON.stringify(spots));
@@ -182,8 +182,6 @@ export function testSpotRotation(
   );
   const spotId = (dayOfYear % totalSpots) + 1;
 
-  console.log(
-    `${dateString} (${testDate.toDateString()}) → Day ${dayOfYear} → Spot ${spotId}`,
-  );
+  
   return spotId;
 }

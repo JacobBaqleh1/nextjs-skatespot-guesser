@@ -19,8 +19,6 @@ export default function StreetView({ coordinates }: StreetViewProps) {
     if (hasRendered.current) return;
     hasRendered.current = true;
 
-    console.log("Loading Google Maps...");
-
     const loader = new Loader({
       apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
       version: "weekly",
@@ -29,8 +27,6 @@ export default function StreetView({ coordinates }: StreetViewProps) {
     loader
       .load()
       .then(() => {
-        console.log("Google Maps API loaded");
-
         if (!streetViewRef.current) {
           console.warn("Street View ref is null");
           return;
@@ -42,16 +38,10 @@ export default function StreetView({ coordinates }: StreetViewProps) {
           lng: coordinates.lng,
         };
 
-        console.log("Fetching panorama for:", targetLocation);
-
         svService.getPanorama(
           { location: targetLocation, radius: 100 },
           (data, status) => {
-            console.log("Panorama status:", status);
-
             if (status === google.maps.StreetViewStatus.OK) {
-              console.log("Panorama data:", data);
-
               panoramaRef.current = new google.maps.StreetViewPanorama(
                 streetViewRef.current!,
                 {

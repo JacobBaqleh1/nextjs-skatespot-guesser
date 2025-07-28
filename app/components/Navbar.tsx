@@ -19,7 +19,6 @@ export default function Navbar() {
   const handleSignOut = async () => {
     try {
       await signOutUser();
-      console.log("User signed out successfully");
     } catch (error: any) {
       console.error("Sign-out failed:", error.message);
       alert("Failed to sign out");
@@ -38,7 +37,6 @@ export default function Navbar() {
                   onClick={() => router.push("/")}
                   className="flex items-center gap-2 text-lg font-semibold text-lime-400 hover:text-white px-4 py-1 rounded-full bg-gray-800 hover:bg-lime-500/20 shadow transition-all duration-200 cursor-pointer"
                 >
-                  
                   Home
                 </button>
                 <div className="text-sm text-gray-300">

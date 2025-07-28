@@ -141,7 +141,6 @@ export async function saveGameToFirestore(
       lastPlayedDate: today,
       updatedAt: Timestamp.now(),
     });
-    console.log("game saved to firestore successfully");
   } catch (error) {
     console.error("error", error);
     throw error;

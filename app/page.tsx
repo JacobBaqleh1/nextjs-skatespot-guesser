@@ -62,7 +62,6 @@ export default function Home() {
   const handleSignOut = async () => {
     try {
       await signOutUser();
-      console.log("User signed out successfully");
     } catch (error: any) {
       console.error("Sign-out failed:", error.message);
       alert("Failed to sign out");

@@ -96,8 +96,6 @@ export default function StatsPage() {
             <div className="text-gray-300">Total Score</div>
           </div>
 
-          
-
           <div className="bg-gray-800 rounded-lg p-6 text-center">
             <div className="text-3xl font-bold text-orange-400">
               {stats.streakCount}

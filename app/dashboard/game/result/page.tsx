@@ -67,7 +67,6 @@ export default function ResultPage() {
             [gameData.correctLat, gameData.correctLng],
           );
           setHasSaved(true);
-          console.log("game result save to firestore");
         } catch (error) {
           console.error("failed to save to firestore", error);
         } finally {
@@ -147,7 +146,6 @@ export default function ResultPage() {
     try {
       const user = await signInWithGoogle();
       if (user) {
-        console.log("signed in successfully:", user.displayName);
         setShowAuthPrompt(false);
         // optionally save the game result to Firestore here
       }

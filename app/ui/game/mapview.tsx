@@ -138,7 +138,7 @@ export default function MapView({
       </MapContainer>
 
       {/* Submit button */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-[1000]">
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-[1000] cursor-pointer">
         <button
           onClick={handleSubmit}
           disabled={!guessCoords}

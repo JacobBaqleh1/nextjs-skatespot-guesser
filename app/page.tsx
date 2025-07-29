@@ -79,9 +79,9 @@ export default function Home() {
           Skate Spotter
         </h1>
 
-        <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+        {/* <p className="text-xl text-gray-300 max-w-2xl mx-auto">
           Can you identify skate spots from Street View and footage?
-        </p>
+        </p> */}
       </div>
 
       {/* Show result if played today, otherwise show play button */}

@@ -33,12 +33,12 @@ export interface GameRecord {
   playedAt: Timestamp;
 }
 
-function getTodayLocalDate(): string {
-  const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, "0");
-  const dd = String(today.getDate()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}`;
+function getTodayUTCDate(): string {
+  const now = new Date();
+  const year = now.getUTCFullYear();
+  const month = String(now.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(now.getUTCDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 export async function createUserStats(uid: string): Promise<void> {
@@ -92,7 +92,7 @@ export async function saveGameToFirestore(
     if (!currentStats) {
       throw new Error("could not retrieve user stats");
     }
-    const today = getTodayLocalDate();
+    const today = getTodayUTCDate();
     const alreadyPlayed = currentStats.gamesHistory.some(
       (game) => game.date === today && game.spotId === spotId,
     );
@@ -100,7 +100,7 @@ export async function saveGameToFirestore(
       return;
     }
     const gameRecord: GameRecord = {
-      date: getTodayLocalDate(),
+      date: getTodayUTCDate(),
       spotId,
       distance,
       score,
@@ -154,7 +154,7 @@ export async function getTodayGameFromFirestore(
     const stats = await getUserStats(uid);
     if (!stats) return null;
 
-    const today = getTodayLocalDate();
+    const today = getTodayUTCDate();
     const todayGame = stats.gamesHistory.find((game) => game.date === today);
 
     return todayGame || null;

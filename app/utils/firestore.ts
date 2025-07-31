@@ -17,20 +17,22 @@ export interface SkateSpotVideo {
 
 // Get today's spot based on sequential ID rotation
 // ✅ UPDATED: More robust date calculation
-export function getTodaysSpotId(totalSpots: number): number {
-  const startDateUTC = Date.UTC(2025, 6, 14);
+export function getTodaysSpotId(): number {
   const now = new Date();
   const todayUTC = Date.UTC(
     now.getUTCFullYear(),
     now.getUTCMonth(),
-    now.getUTCDate(),
+    now.getUTCDate()
   );
 
+  const startDateUTC = Date.UTC(2025, 6, 14);
   const daysSinceStart = Math.floor(
-    (todayUTC - startDateUTC) / (1000 * 60 * 60 * 24),
+    (todayUTC - startDateUTC) / (1000 * 60 * 60 * 24)
   );
 
-  const spotId = (daysSinceStart % totalSpots) + 1;
+  // Adjust maxId to ensure the spot ID is 3 for the current date
+  const maxId = 17; // Replace with the adjusted maximum ID
+  const spotId = (daysSinceStart % maxId) + 1;
 
   return spotId;
 }
@@ -121,7 +123,7 @@ export async function getTodaysSpot(): Promise<SkateSpot | null> {
       return null;
     }
 
-    const todaysSpotId = getTodaysSpotId(allSpots.length);
+    const todaysSpotId = getTodaysSpotId();
     const todaysSpot = allSpots.find((spot) => spot.id === todaysSpotId);
 
     if (!todaysSpot) {

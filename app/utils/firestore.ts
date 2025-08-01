@@ -25,14 +25,20 @@ export function getTodaysSpotId(): number {
     now.getUTCDate()
   );
 
-  const startDateUTC = Date.UTC(2025, 6, 14);
+  const startDateUTC = Date.UTC(2025, 7, 1); // Adjusted to start today
   const daysSinceStart = Math.floor(
     (todayUTC - startDateUTC) / (1000 * 60 * 60 * 24)
   );
 
-  // Adjust maxId to ensure the spot ID is 3 for the current date
-  const maxId = 17; // Replace with the adjusted maximum ID
-  const spotId = (daysSinceStart % maxId) + 1;
+  // Start at ID 3 today and keep incrementing
+  const initialId = 3;
+  const spotId = daysSinceStart + initialId;
+
+  // Edge case: If no valid ID is found, keep the same ID and retry the next day
+  if (!spotId || spotId <= 0) {
+    console.warn("No valid ID found, keeping the same ID until the next day.");
+    return initialId; // Keep the initial ID
+  }
 
   return spotId;
 }

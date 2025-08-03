@@ -21,7 +21,7 @@
 ## 🎯 Purpose & Learning Goals
 
 I built this project to:
-- Firebase database
+- Learn about Firebase database
 - Solidify my understanding of **TypeScript** and **React functional components**
 - Learn how to **work with third-party APIs and SDKs** in a modern frontend workflow
 - Combine my love of skateboarding with a technical challenge that’s fun and interactive

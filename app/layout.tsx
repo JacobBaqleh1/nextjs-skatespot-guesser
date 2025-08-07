@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Spotta",
+  title: "Skate Spotter",
   description: "Geoguessing skate spots",
   icons: {
     icon: "https://fav.farm/🛹",

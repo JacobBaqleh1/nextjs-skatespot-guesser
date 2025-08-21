@@ -25,13 +25,13 @@ export function getTodaysSpotId(): number {
     now.getUTCDate()
   );
 
-  const startDateUTC = Date.UTC(2025, 7, 1); // Adjusted to start today
+  const startDateUTC = Date.UTC(2025, 7, 20); // Adjusted to start today
   const daysSinceStart = Math.floor(
     (todayUTC - startDateUTC) / (1000 * 60 * 60 * 24)
   );
 
   // Start at ID 3 today and keep incrementing
-  const initialId = 3;
+  const initialId = 18;
   const spotId = daysSinceStart + initialId;
 
   // Edge case: If no valid ID is found, keep the same ID and retry the next day
